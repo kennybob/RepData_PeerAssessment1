@@ -1,0 +1,17 @@
+{
+    "contents" : "unzip(\"activity.zip\")\n\nact_df <- read.csv(\"activity.csv\")\n\ntotal_steps_per_day <- tapply(act_df$steps, act_df$date, sum)\nhist(total_steps_per_day)\ncat(\"mean: \",mean(total_steps_per_day, na.rm=TRUE), \"\\n\")\ncat(\"median: \",median(total_steps_per_day, na.rm=TRUE), \"\\n\")\n\n#What is mean total number of steps taken per day?\nget_mean_per_day(act_df)\n\n#What is the average daily activity pattern?\nmean_Steps_per_interval <- tapply(act_df$steps, act_df$interval, mean, na.rm = TRUE)\ndf <- as.data.frame(mean_Steps_per_interval)\ndf$interval = rownames(df)\nplot(df$interval, df$mean_Steps_per_interval, type =\"l\")\ndf[df$mean_Steps_per_interval==max(df$mean_Steps_per_interval),]\n\n\n#Inputing missing values\nsum(is.na(act_df[1]))\nsum(is.na(act_df[2]))\nsum(is.na(act_df[3]))\n\n##Fill in the blanks\nlibrary(plyr)\nmergeDf <- join(act_df,df)\nmergeDf[is.na(mergeDf[1]),]$steps = mergeDf[is.na(mergeDf[1]),]$mean_Steps_per_interval\n\n## Now recreate the histogram as before\nget_mean_per_day(mergeDf)\n\n\n\n#Are there differences in activity patterns between weekdays and weekends?\nlibrary(lubridate)\nmergeDf_wk <- mutate(mergeDf, wkend=factor(weekdays(ymd(as.character(mergeDf$date))) %in% c(\"Saturday\", \"Sunday\"), labels = c(\"Weekday\",\"Weekend\")))\n\n##weekdays\nget_mean_per_day(mergeDf_wk[mergeDf_wk$wkend==\"Weekday\",])\n\n##weekends\nget_mean_per_day(mergeDf_wk[mergeDf_wk$wkend==\"Weekend\",])\n\nlibrary(lattice)\n\n#xyplot  scatterplot  y~x|A\n#Make a panel plot containing a time series plot (i.e. type = \"l\") \n#of the 5-minute interval (x-axis) \n#and the average number of steps taken, averaged across all \n#weekday days or weekend days (y-axis).\n\n\n\n\n#What is the average daily activity pattern?\nagg <- aggregate( mergeDf_wk[,\"steps\"], mergeDf_wk[,c(\"interval\",\"wkend\")], FUN = mean )\n\nbig_join <- join(mergeDf_wk,agg)\n\npanel.smoother <- function(x, y) {\n  panel.xyplot(x, y) # show points \n  panel.loess(x, y)  # show smoothed line \n}\n\nbig_join =  transform(big_join, interval)\n\nxyplot(x~interval|wkend, data=big_join, layout=c(1,2), xlab = \"Interval\", ylab = \"Average steps per interval\", type = \"o\")\n\n",
+    "created" : 1428609463197.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2405313979",
+    "id" : "BA1BC71E",
+    "lastKnownWriteTime" : 1428802053,
+    "path" : "~/GitHub/RepData_PeerAssessment1/s.r",
+    "project_path" : "s.r",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}
